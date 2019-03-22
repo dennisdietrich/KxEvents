@@ -6,6 +6,9 @@ public open class EventArgs<TSource, TValue> public constructor(
 
 public class CancellableEventArgs<TSource, TValue> public constructor(
     source: TSource,
-    value: TValue,
-    public var cancelled: Boolean = false
-) : EventArgs<TSource, TValue>(source, value)
+    value: TValue
+) : EventArgs<TSource, TValue>(
+    source,
+    value) {
+    public var cancelled = false
+}

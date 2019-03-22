@@ -32,7 +32,7 @@ public abstract class EventBase<TSource, TValue, TArgs : EventArgs<TSource, TVal
     internal abstract fun raise(args: TArgs)
 }
 
-public class Event<TSource, TValue> : EventBase<TSource, TValue, EventArgs<TSource, TValue>>() {
+public class Event<TSource, TValue> internal constructor() : EventBase<TSource, TValue, EventArgs<TSource, TValue>>() {
     internal override fun raise(args: EventArgs<TSource, TValue>) {
         val currentHandlers = handlers.get()!!
 
@@ -41,7 +41,7 @@ public class Event<TSource, TValue> : EventBase<TSource, TValue, EventArgs<TSour
     }
 }
 
-public class CancellableEvent<TSource, TValue> : EventBase<TSource, TValue, CancellableEventArgs<TSource, TValue>>() {
+public class CancellableEvent<TSource, TValue> internal constructor() : EventBase<TSource, TValue, CancellableEventArgs<TSource, TValue>>() {
     internal override fun raise(args: CancellableEventArgs<TSource, TValue>) {
         val currentHandlers = handlers.get()!!
 

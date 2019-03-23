@@ -5,8 +5,8 @@ public class EventManager {
 
     public fun<TSource, TValue> createEvent(): Event<TSource, TValue> {
         val event = Event<TSource, TValue>()
-        events.add(event);
-        return event;
+        events.add(event)
+        return event
     }
 
     public fun<TSource, TValue> createCancellableEvent(): CancellableEvent<TSource, TValue> {

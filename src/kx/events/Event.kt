@@ -20,7 +20,7 @@ public abstract class EventBase<TSource, TValue, TArgs : EventArgs<TSource, TVal
             if (index < 0)
                 return
 
-            val newArray = Array<(TArgs) -> Unit>(oldArray.size - 1) {
+            val newArray = Array(oldArray.size - 1) {
                 if (it < index)
                     oldArray[it]
                 else

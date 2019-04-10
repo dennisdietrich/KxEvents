@@ -61,8 +61,8 @@ public class EventBaseTests {
     public fun minusAssign() {
         val event = Event<Any?, Any?>()
 
-        val h1: (EventArgs<Any?, Any?>) -> Unit = { _ -> run { } }
-        val h2: (EventArgs<Any?, Any?>) -> Unit = { _ -> run { } }
+        val h1: (EventArgs<Any?, Any?>) -> Unit = { }
+        val h2: (EventArgs<Any?, Any?>) -> Unit = { }
 
         event -= h1
         var handlers = event.getHandlers()!!.get()!!
@@ -95,5 +95,62 @@ public class EventBaseTests {
         event -= h1
         handlers = event.getHandlers()!!.get()!!
         assertEquals(0, handlers.size)
+    }
+
+    @Test
+    public fun plusAssign_ThreadSafety() {
+        val event = Event<Any?, Any?>()
+        val threads = mutableListOf<Thread>()
+
+        val numberOfThreads = Runtime.getRuntime().availableProcessors()
+        val iterationsPerThread = 10000
+
+        for (i in 0 until numberOfThreads) {
+            threads += Thread {
+                val h: (EventArgs<Any?, Any?>) -> Unit = { }
+
+                for (j in 1..iterationsPerThread)
+                    event += h
+            }
+
+            threads[i].run()
+        }
+
+        for (i in 0 until numberOfThreads)
+            threads[i].join()
+
+        assertEquals(numberOfThreads * iterationsPerThread, event.getHandlers()!!.get().size)
+    }
+
+    @Test
+    public fun minusAssign_ThreadSafety() {
+        val event = Event<Any?, Any?>()
+        val handlers = mutableListOf<(EventArgs<Any?, Any?>) -> Unit>()
+
+        val numberOfThreads = Runtime.getRuntime().availableProcessors()
+        val iterationsPerThread = 10000
+
+        for (i in 0 until numberOfThreads) {
+            handlers += { }
+
+            for (j in 1..iterationsPerThread)
+                event += handlers[i]
+        }
+
+        val threads = mutableListOf<Thread>()
+
+        for (i in 0 until numberOfThreads) {
+            threads += Thread {
+                for (j in 1..iterationsPerThread)
+                    event -= handlers[i]
+            }
+
+            threads[i].run()
+        }
+
+        for (i in 0 until numberOfThreads)
+            threads[i].join()
+
+        assertEquals(0, event.getHandlers()!!.get().size)
     }
 }

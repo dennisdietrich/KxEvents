@@ -1,19 +1,25 @@
 package kx.events
 
 import java.util.concurrent.atomic.*
+import kotlin.reflect.*
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.*
 import kotlin.test.*
 import org.junit.jupiter.api.*
 
-@Suppress("UNCHECKED_CAST")
-private fun<TSource, TValue, TArgs : EventArgs<TSource, TValue>> EventBase<TSource, TValue, TArgs>.getHandlers(): AtomicReference<Array<(TArgs) -> Unit>>? {
-    val property = EventBase::class.memberProperties.find { it.name == "handlers" }!!
-    property.isAccessible = true
-    return property.get(this) as? AtomicReference<Array<(TArgs) -> Unit>>
-}
-
 public class EventBaseTests {
+    private lateinit var handlersProperty: KProperty1<EventBase<*, *, *>, *>
+
+    @Suppress("UNCHECKED_CAST")
+    private fun<TSource, TValue, TArgs : EventArgs<TSource, TValue>> EventBase<TSource, TValue, TArgs>.getHandlers(): AtomicReference<Array<(TArgs) -> Unit>>? {
+        if (!::handlersProperty.isInitialized) {
+            handlersProperty = EventBase::class.memberProperties.find { it.name == "handlers" }!!
+            handlersProperty.isAccessible = true
+        }
+
+        return handlersProperty.get(this) as? AtomicReference<Array<(TArgs) -> Unit>>
+    }
+
     private class Event<TSource, TValue> : EventBase<TSource, TValue, EventArgs<TSource, TValue>>() {
         internal override fun raise(args: EventArgs<TSource, TValue>) {
         }
@@ -152,5 +158,48 @@ public class EventBaseTests {
             threads[i].join()
 
         assertEquals(0, event.getHandlers()!!.get().size)
+    }
+}
+
+public class EventTests {
+    @Test
+    public fun raise() {
+        val source = Object()
+        val event = Event<Any, String>()
+        val args = mutableListOf<String>()
+
+        event.raise(EventArgs(source, ""))
+        assertEquals(0, args.size)
+
+        val h1: (EventArgs<Any, String>) -> Unit = {
+            assertSame(source, it.source)
+            args += it.value + "h1"
+        }
+        event += h1
+
+        event.raise(EventArgs(source, "e1"))
+        assertEquals(1, args.size)
+        assertEquals("e1h1", args[0])
+
+        args.clear()
+        val h2: (EventArgs<Any, String>) -> Unit = {
+            assertSame(source, it.source)
+            args += it.value + "h2"
+        }
+        event += h2
+
+        event.raise(EventArgs(source, "e2"))
+        assertEquals(2, args.size)
+        assertEquals("e2h1", args[0])
+        assertEquals("e2h2", args[1])
+
+        args.clear()
+        event += h1
+
+        event.raise(EventArgs(source, "e3"))
+        assertEquals(3, args.size)
+        assertEquals("e3h1", args[0])
+        assertEquals("e3h2", args[1])
+        assertEquals("e3h1", args[2])
     }
 }

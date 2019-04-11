@@ -203,3 +203,75 @@ public class EventTests {
         assertEquals("e3h1", args[2])
     }
 }
+
+public class CancellableEventTests {
+    @Test
+    public fun raise() {
+        val source = Object()
+        val event = CancellableEvent<Any, String>()
+        val args = mutableListOf<String>()
+
+        event.raise(CancellableEventArgs(source, ""))
+        assertEquals(0, args.size)
+
+        val h1: (CancellableEventArgs<Any, String>) -> Unit = {
+            assertSame(source, it.source)
+            args += it.value + "h1"
+        }
+        event += h1
+
+        event.raise(CancellableEventArgs(source, "e1"))
+        assertEquals(1, args.size)
+        assertEquals("e1h1", args[0])
+
+        args.clear()
+        val h2: (CancellableEventArgs<Any, String>) -> Unit = {
+            assertSame(source, it.source)
+            args += it.value + "h2"
+        }
+        event += h2
+
+        event.raise(CancellableEventArgs(source, "e2"))
+        assertEquals(2, args.size)
+        assertEquals("e2h1", args[0])
+        assertEquals("e2h2", args[1])
+
+        args.clear()
+        event += h1
+
+        event.raise(CancellableEventArgs(source, "e3"))
+        assertEquals(3, args.size)
+        assertEquals("e3h1", args[0])
+        assertEquals("e3h2", args[1])
+        assertEquals("e3h1", args[2])
+    }
+
+    @Test
+    public fun raise_cancel() {
+        val source = Object()
+        val event = CancellableEvent<Any, String>()
+        val args = mutableListOf<String>()
+
+        val h1: (CancellableEventArgs<Any, String>) -> Unit = {
+            assertSame(source, it.source)
+            it.cancelled = true
+            args += it.value + "h1"
+        }
+        event += h1
+
+        event.raise(CancellableEventArgs(source, "e1"))
+        assertEquals(1, args.size)
+        assertEquals("e1h1", args[0])
+
+        args.clear()
+        val h2: (CancellableEventArgs<Any, String>) -> Unit = {
+            assertSame(source, it.source)
+            args += it.value + "h2"
+        }
+        event += h2
+
+        event.raise(CancellableEventArgs(source, "e2"))
+        assertEquals(1, args.size)
+        assertEquals("e2h1", args[0])
+    }
+}

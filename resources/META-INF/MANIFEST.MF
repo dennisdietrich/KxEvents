@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Implementation-Title: KxEvents
+Implementation-Vendor: Dennis "D.C." Dietrich
+Implementation-Version: 1.0.0

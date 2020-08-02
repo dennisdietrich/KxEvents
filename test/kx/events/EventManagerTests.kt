@@ -23,9 +23,26 @@ public class EventManagerTests {
         var raised = false
 
         event += { raised = true }
-        manager.raise(event, null, null)
+        manager.raise(event, null, null as Any?)
 
         assertTrue(raised)
+    }
+
+    @Test
+    public fun raise_Event_WithGenerator() {
+        val manager = EventManager()
+        val event = manager.createEvent<Any?, Unit>()
+
+        var generatorCalled = false
+        val generatorCallback = { generatorCalled = true }
+        manager.raise(event, null, generatorCallback)
+        assertFalse(generatorCalled)
+
+        var raised = false
+        event += { raised = true }
+        manager.raise(event, null, generatorCallback)
+        assertTrue(raised)
+        assertTrue(generatorCalled)
     }
 
     @Test
@@ -35,9 +52,26 @@ public class EventManagerTests {
         var raised = false
 
         event += { raised = true }
-        manager.raise(event, null, null)
+        manager.raise(event, null, null as Any?)
 
         assertTrue(raised)
+    }
+
+    @Test
+    public fun raise_CancellableEvent_WithGenerator() {
+        val manager = EventManager()
+        val event = manager.createCancellableEvent<Any?, Unit>()
+
+        var generatorCalled = false
+        val generatorCallback = { generatorCalled = true }
+        manager.raise(event, null, generatorCallback)
+        assertFalse(generatorCalled)
+
+        var raised = false
+        event += { raised = true }
+        manager.raise(event, null, generatorCallback)
+        assertTrue(raised)
+        assertTrue(generatorCalled)
     }
 
     @Test
@@ -45,7 +79,7 @@ public class EventManagerTests {
         val event   = Event<Any?, Any?>()
         val manager = EventManager()
 
-        assertThrows<EventOwnershipException> { manager.raise(event, null, null) }
+        assertThrows<EventOwnershipException> { manager.raise(event, null, null as Any?) }
     }
 
     @Test
@@ -53,6 +87,6 @@ public class EventManagerTests {
         val event   = CancellableEvent<Any?, Any?>()
         val manager = EventManager()
 
-        assertThrows<EventOwnershipException> { manager.raise(event, null, null) }
+        assertThrows<EventOwnershipException> { manager.raise(event, null, null as Any?) }
     }
 }

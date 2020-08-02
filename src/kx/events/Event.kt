@@ -3,18 +3,21 @@ package kx.events
 import java.util.concurrent.atomic.*
 
 public abstract class EventBase<TSource, TValue, TArgs : EventArgs<TSource, TValue>> {
+    internal val handlerCount
+        get() = handlers.get().size
+
     protected val handlers = AtomicReference(arrayOf<(TArgs) -> Unit>())
 
     public operator fun plusAssign(handler: (TArgs) -> Unit) {
         do {
-            val oldArray = handlers.get()!!
+            val oldArray = handlers.get()
             val newArray = oldArray + handler
         } while (!handlers.compareAndSet(oldArray, newArray))
     }
 
     public operator fun minusAssign(handler: (TArgs) ->Unit) {
         do {
-            val oldArray = handlers.get()!!
+            val oldArray = handlers.get()
             val index    = oldArray.indexOf(handler)
 
             if (index < 0)
@@ -34,7 +37,7 @@ public abstract class EventBase<TSource, TValue, TArgs : EventArgs<TSource, TVal
 
 public class Event<TSource, TValue> internal constructor() : EventBase<TSource, TValue, EventArgs<TSource, TValue>>() {
     internal override fun raise(args: EventArgs<TSource, TValue>) {
-        val currentHandlers = handlers.get()!!
+        val currentHandlers = handlers.get()
 
         for (handler in currentHandlers)
             handler(args)
@@ -43,7 +46,7 @@ public class Event<TSource, TValue> internal constructor() : EventBase<TSource, 
 
 public class CancellableEvent<TSource, TValue> internal constructor() : EventBase<TSource, TValue, CancellableEventArgs<TSource, TValue>>() {
     internal override fun raise(args: CancellableEventArgs<TSource, TValue>) {
-        val currentHandlers = handlers.get()!!
+        val currentHandlers = handlers.get()
 
         for (handler in currentHandlers) {
             handler(args)

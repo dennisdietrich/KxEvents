@@ -6,88 +6,94 @@ import org.junit.jupiter.api.*
 
 public class EventManagerTests {
     @Test
+    public fun constructor() {
+        val manager = EventManager(this)
+        assertSame(this, manager.source)
+    }
+
+    @Test
     public fun createEvent() {
-        val manager = EventManager()
-        assertNotSame(manager.createEvent<Any, Any>(), manager.createEvent())
+        val manager = EventManager(this)
+        assertNotSame(manager.createEvent<Any>(), manager.createEvent())
     }
 
     @Test
     public fun createCancellableEvent() {
-        val manager = EventManager()
-        assertNotSame(manager.createCancellableEvent<Any, Any>(), manager.createCancellableEvent())
+        val manager = EventManager(this)
+        assertNotSame(manager.createCancellableEvent<Any>(), manager.createCancellableEvent())
     }
 
     @Test
     public fun raise_Event() {
-        val manager = EventManager()
-        val event = manager.createEvent<Any?, Any?>()
+        val manager = EventManager(this)
+        val event = manager.createEvent<Any?>()
         var raised = false
 
         event += { raised = true }
-        manager.raise(event, null, null as Any?)
+        manager.raise(event, null as Any?)
 
         assertTrue(raised)
     }
 
     @Test
     public fun raise_Event_WithGenerator() {
-        val manager = EventManager()
-        val event = manager.createEvent<Any?, Unit>()
+        val manager = EventManager(this)
+        val event = manager.createEvent<Unit>()
 
         var generatorCalled = false
         val generatorCallback = { generatorCalled = true }
-        manager.raise(event, null, generatorCallback)
+        manager.raise(event, generatorCallback)
         assertFalse(generatorCalled)
 
         var raised = false
         event += { raised = true }
-        manager.raise(event, null, generatorCallback)
+        manager.raise(event, generatorCallback)
         assertTrue(raised)
         assertTrue(generatorCalled)
     }
 
     @Test
     public fun raise_CancellableEvent() {
-        val manager = EventManager()
-        val event = manager.createCancellableEvent<Any?, Any?>()
+        val manager = EventManager(this)
+        val event = manager.createCancellableEvent<Any?>()
         var raised = false
 
         event += { raised = true }
-        manager.raise(event, null, null as Any?)
+        manager.raise(event, null as Any?)
 
         assertTrue(raised)
     }
 
     @Test
     public fun raise_CancellableEvent_WithGenerator() {
-        val manager = EventManager()
-        val event = manager.createCancellableEvent<Any?, Unit>()
+        val manager = EventManager(this)
+        val event = manager.createCancellableEvent<Unit>()
 
         var generatorCalled = false
         val generatorCallback = { generatorCalled = true }
-        manager.raise(event, null, generatorCallback)
+        manager.raise(event, generatorCallback)
         assertFalse(generatorCalled)
 
         var raised = false
         event += { raised = true }
-        manager.raise(event, null, generatorCallback)
+        manager.raise(event, generatorCallback)
         assertTrue(raised)
         assertTrue(generatorCalled)
     }
 
     @Test
     public fun raise_UnownedEvent() {
-        val event   = Event<Any?, Any?>()
-        val manager = EventManager()
+        val event   = Event<EventManagerTests, Any?>()
+        val manager = EventManager(this)
 
-        assertThrows<EventOwnershipException> { manager.raise(event, null, null as Any?) }
+        assertThrows<EventOwnershipException> { manager.raise(event, null as Any?) }
     }
 
     @Test
     public fun raise_UnownedCancellableEvent() {
-        val event   = CancellableEvent<Any?, Any?>()
-        val manager = EventManager()
+        val event   = CancellableEvent<EventManagerTests, Any?>()
+        val manager = EventManager(this)
 
-        assertThrows<EventOwnershipException> { manager.raise(event, null, null as Any?) }
+        assertThrows<EventOwnershipException> { manager.raise(event, null as Any?) }
     }
 }

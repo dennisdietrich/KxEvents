@@ -8,7 +8,7 @@ public class EventOwnershipExceptionTests {
     @Test
     public fun constructor() {
         val event   = Event<Any, Any>()
-        val manager = EventManager()
+        val manager = EventManager(this)
 
         val exception = EventOwnershipException(event, manager)
         assertSame(event, exception.event)

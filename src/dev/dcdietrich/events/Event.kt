@@ -1,4 +1,4 @@
-package kx.events
+package dev.dcdietrich.events
 
 import java.util.concurrent.atomic.*
 

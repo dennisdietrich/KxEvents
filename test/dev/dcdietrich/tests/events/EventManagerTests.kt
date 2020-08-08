@@ -1,5 +1,6 @@
-package kx.events
+package dev.dcdietrich.tests.events
 
+import dev.dcdietrich.events.*
 import kotlin.test.*
 import org.junit.jupiter.api.*
 

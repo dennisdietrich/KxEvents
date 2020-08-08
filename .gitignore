@@ -26,3 +26,6 @@
 # IntelliJ
 out/
 lib/
+
+# macOS files
+.DS_Store

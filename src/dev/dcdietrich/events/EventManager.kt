@@ -1,4 +1,4 @@
-package kx.events
+package dev.dcdietrich.events
 
 public class EventManager {
     private val events = HashSet<EventBase<*, *, *>>()
@@ -39,7 +39,7 @@ public class EventManager {
         return null
     }
 
-    private fun validateOwnership(event: EventBase<* ,* ,*>) {
+    private fun validateOwnership(event: EventBase<*, *, *>) {
         if (!events.contains(event))
             throw EventOwnershipException(event, this)
     }

@@ -1,5 +1,6 @@
-package kx.events
+package dev.dcdietrich.tests.events
 
+import dev.dcdietrich.events.*
 import java.util.concurrent.atomic.*
 import kotlin.reflect.*
 import kotlin.reflect.full.*

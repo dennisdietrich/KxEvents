@@ -1,4 +1,4 @@
-package kx.events
+package dev.dcdietrich.events
 
 public open class EventArgs<TSource, TValue>
 public constructor(public val source: TSource, public val value: TValue)
